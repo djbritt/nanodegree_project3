@@ -24,9 +24,9 @@ for i in range(0, 3):
 print "------------------------"
 
 print "Who are the most popular article authors of all time?"
-q2 = dbCall("select name, count(slug) as views from articles join authors on
-            articles.author=authors.id join log on replace
-            (log.path, '/article/', '')=articles.slug group by name order
+q2 = dbCall("select name, count(slug) as views from articles join authors on \
+            articles.author=authors.id join log on replace \
+            (log.path, '/article/', '')=articles.slug group by name order \
             by views desc")
 
 for i in range(0, len(q2)):
@@ -35,9 +35,9 @@ for i in range(0, len(q2)):
 print "------------------------"
 
 print "On which days did more than 1% of requests lead to errors?"
-q3 = dbCall("select date(time) as dayParsed, ((count(date(time))*100)/ \
-            (select count(*) from log where status not like '200%')) as \
-            errorCount from log where status not like '200%' group by \
-            dayParsed order by errorCount desc limit 1;")
+q3 = dbCall("select date(time) as dayParsed, dayError.dError::float/count(*)\
+            as percent from log join dayError on date(time) = dayError.day\
+            group by dayParsed, dayError.dError order by percent desc\
+            limit 1;")
 
-print str(q3[0][0]) + " -- " + str(q3[0][1]) + "% errors"
+print str(q3[0][0]) + " -- " + "{0:.0f}".format(q3[0][1] * 100) + "% errors"
